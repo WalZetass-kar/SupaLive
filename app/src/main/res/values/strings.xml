@@ -1,0 +1,36 @@
+<resources>
+    <string name="app_name">Supalive</string>
+    <string name="tagline">Read-only Supabase health monitor</string>
+    <string name="sign_in_with_google">Sign in with Google</string>
+    <string name="sign_out">Sign out</string>
+    <string name="auth_subtitle">Monitor Supabase projects with automated 12-hour read-only REST checks.</string>
+    <string name="auth_disclosure_title">Scope</string>
+    <string name="auth_disclosure_body">Checks query public.supalive_health (read-only). Passing checks verify reachability, not pause prevention.</string>
+
+    <string name="nav_overview">Overview</string>
+    <string name="nav_projects">Projects</string>
+    <string name="nav_logs">Logs</string>
+    <string name="nav_alerts">Alerts</string>
+    <string name="nav_settings">Settings</string>
+
+    <string name="action_add_project">Add Project</string>
+    <string name="action_check_now">Check Now</string>
+    <string name="action_validate">Validate</string>
+    <string name="action_copy_sql">Copy SQL</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_save">Save</string>
+    <string name="action_mark_all_read">Mark all read</string>
+    <string name="action_retry">Retry</string>
+    <string name="action_open_supabase_dashboard">Open Supabase Dashboard</string>
+
+    <string name="empty_projects_title">No projects yet</string>
+    <string name="empty_projects_body">Add a Supabase URL and Publishable Key to begin.</string>
+    <string name="empty_logs_title">No logs yet</string>
+    <string name="empty_logs_body">Run a check or wait for the 12h schedule.</string>
+    <string name="empty_alerts_title">No alerts</string>
+    <string name="empty_alerts_body">Failure and recovery alerts appear here.</string>
+
+    <string name="sql_setup_title">Health-Check Table SQL</string>
+    <string name="sql_setup_hint">Run once in your Supabase SQL Editor:</string>
+</resources>

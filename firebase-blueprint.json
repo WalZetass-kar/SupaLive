@@ -1,0 +1,368 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Authenticated user profile and notification alert preferences.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Authenticated Firebase UID owning this profile."
+        },
+        "email": {
+          "type": "string",
+          "description": "User email address from Google Sign-In."
+        },
+        "fullName": {
+          "type": "string",
+          "description": "Display name."
+        },
+        "emailAlertsEnabled": {
+          "type": "boolean",
+          "description": "Whether email alert preference is enabled."
+        },
+        "inAppAlertsEnabled": {
+          "type": "boolean",
+          "description": "Whether in-app alert notifications are created on failures."
+        },
+        "failureThreshold": {
+          "type": "integer",
+          "description": "Consecutive failures required before triggering an alert."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when created (FieldValue.serverTimestamp())."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when last updated (FieldValue.serverTimestamp())."
+        }
+      },
+      "required": [
+        "userId",
+        "email",
+        "fullName",
+        "emailAlertsEnabled",
+        "inAppAlertsEnabled",
+        "failureThreshold",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "SupabaseProject": {
+      "title": "SupabaseProject",
+      "description": "Registered Supabase project configuration, encrypted publishable key, and monitoring schedule state.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Owner Firebase UID."
+        },
+        "projectName": {
+          "type": "string",
+          "description": "User-facing label for the Supabase project."
+        },
+        "projectUrl": {
+          "type": "string",
+          "description": "Validated HTTPS Supabase project URL (https://<ref>.supabase.co)."
+        },
+        "projectRef": {
+          "type": "string",
+          "description": "Extracted Supabase project reference ID."
+        },
+        "maskedKey": {
+          "type": "string",
+          "description": "Masked publishable key preview for UI display only."
+        },
+        "publishableKeyEncrypted": {
+          "type": "string",
+          "description": "AES-256-GCM encrypted publishable key (versioned v1:iv:ciphertext)."
+        },
+        "keyVersion": {
+          "type": "integer",
+          "description": "Encryption key version."
+        },
+        "healthStatus": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "healthy",
+            "warning",
+            "unreachable",
+            "credential_error",
+            "configuration_error",
+            "suspected_paused",
+            "monitoring_disabled"
+          ],
+          "description": "Current evaluated health status."
+        },
+        "monitoringEnabled": {
+          "type": "boolean",
+          "description": "Whether 12-hour scheduled monitoring is enabled."
+        },
+        "intervalHours": {
+          "type": "integer",
+          "description": "Monitoring cadence in hours (default 12)."
+        },
+        "phaseOffsetMinutes": {
+          "type": "integer",
+          "description": "Stable randomized phase offset in minutes (0..719) to spread check load."
+        },
+        "nextCheckEpochMs": {
+          "type": "integer",
+          "description": "Epoch milliseconds for the next scheduled 12-hour check."
+        },
+        "lastCheckedEpochMs": {
+          "type": "integer",
+          "description": "Epoch milliseconds of the most recent health check."
+        },
+        "lastSuccessEpochMs": {
+          "type": "integer",
+          "description": "Epoch milliseconds of the most recent successful health check."
+        },
+        "lastLatencyMs": {
+          "type": "integer",
+          "description": "Response latency in milliseconds of the latest check."
+        },
+        "consecutiveFailures": {
+          "type": "integer",
+          "description": "Consecutive failed checks counter."
+        },
+        "lastSanitizedError": {
+          "type": "string",
+          "description": "Sanitized diagnostic message from the latest failure (no secrets)."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when created."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when updated."
+        }
+      },
+      "required": [
+        "userId",
+        "projectName",
+        "projectUrl",
+        "projectRef",
+        "maskedKey",
+        "publishableKeyEncrypted",
+        "keyVersion",
+        "healthStatus",
+        "monitoringEnabled",
+        "intervalHours",
+        "phaseOffsetMinutes",
+        "nextCheckEpochMs",
+        "lastCheckedEpochMs",
+        "lastSuccessEpochMs",
+        "lastLatencyMs",
+        "consecutiveFailures",
+        "lastSanitizedError",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "MonitoringLog": {
+      "title": "MonitoringLog",
+      "description": "Immutable execution record for a manual, validation, or scheduled health check.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string"
+        },
+        "projectId": {
+          "type": "string"
+        },
+        "projectName": {
+          "type": "string"
+        },
+        "checkType": {
+          "type": "string",
+          "enum": ["manual", "scheduled", "validation"]
+        },
+        "result": {
+          "type": "string",
+          "enum": ["success", "failure"]
+        },
+        "resultingStatus": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "healthy",
+            "warning",
+            "unreachable",
+            "credential_error",
+            "configuration_error",
+            "suspected_paused",
+            "monitoring_disabled"
+          ]
+        },
+        "httpStatus": {
+          "type": "integer"
+        },
+        "responseTimeMs": {
+          "type": "integer"
+        },
+        "errorCode": {
+          "type": "string"
+        },
+        "errorMessage": {
+          "type": "string"
+        },
+        "retryCount": {
+          "type": "integer"
+        },
+        "checkedAtEpochMs": {
+          "type": "integer"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "userId",
+        "projectId",
+        "projectName",
+        "checkType",
+        "result",
+        "resultingStatus",
+        "httpStatus",
+        "responseTimeMs",
+        "errorCode",
+        "errorMessage",
+        "retryCount",
+        "checkedAtEpochMs",
+        "createdAt"
+      ]
+    },
+    "AppNotification": {
+      "title": "AppNotification",
+      "description": "In-app health-check alert notification.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string"
+        },
+        "projectId": {
+          "type": "string"
+        },
+        "projectName": {
+          "type": "string"
+        },
+        "notificationType": {
+          "type": "string",
+          "enum": [
+            "health_alert",
+            "credential_error",
+            "configuration_error",
+            "suspected_paused",
+            "recovered"
+          ]
+        },
+        "title": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "readFlag": {
+          "type": "boolean"
+        },
+        "createdAtEpochMs": {
+          "type": "integer"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "userId",
+        "projectId",
+        "projectName",
+        "notificationType",
+        "title",
+        "message",
+        "readFlag",
+        "createdAtEpochMs",
+        "createdAt"
+      ]
+    },
+    "AuditLog": {
+      "title": "AuditLog",
+      "description": "Security audit trail without any API keys or secrets.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string"
+        },
+        "action": {
+          "type": "string"
+        },
+        "resourceType": {
+          "type": "string"
+        },
+        "resourceId": {
+          "type": "string"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "createdAtEpochMs": {
+          "type": "integer"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "userId",
+        "action",
+        "resourceType",
+        "resourceId",
+        "summary",
+        "createdAtEpochMs",
+        "createdAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": {
+        "$ref": "#/entities/UserProfile"
+      },
+      "description": "Authenticated user profile and alert preferences."
+    },
+    "/users/{userId}/projects/{projectId}": {
+      "schema": {
+        "$ref": "#/entities/SupabaseProject"
+      },
+      "description": "User-owned monitored Supabase projects."
+    },
+    "/users/{userId}/logs/{logId}": {
+      "schema": {
+        "$ref": "#/entities/MonitoringLog"
+      },
+      "description": "User-owned health-check execution logs."
+    },
+    "/users/{userId}/notifications/{notificationId}": {
+      "schema": {
+        "$ref": "#/entities/AppNotification"
+      },
+      "description": "User-owned in-app monitoring notifications."
+    },
+    "/users/{userId}/audit_logs/{auditId}": {
+      "schema": {
+        "$ref": "#/entities/AuditLog"
+      },
+      "description": "User-owned security audit trail."
+    }
+  }
+}

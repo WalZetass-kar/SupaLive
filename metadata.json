@@ -1,0 +1,6 @@
+{
+  "name": "Supalive",
+  "description": "Supabase database health-check monitoring, activity logs, and alerts.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
