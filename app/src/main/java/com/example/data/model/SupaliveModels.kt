@@ -33,6 +33,7 @@ data class SupabaseProject(
   val projectRef: String = "",
   val maskedKey: String = "",
   val publishableKeyEncrypted: String = "",
+  val publishableKeyServerEncrypted: String = "",
   val keyVersion: Long = 1L,
   val healthStatus: String = HealthStatus.PENDING.firestoreValue,
   val monitoringEnabled: Boolean = true,

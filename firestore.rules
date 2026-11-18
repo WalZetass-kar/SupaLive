@@ -64,6 +64,7 @@ service cloud.firestore {
              data.projectRef.matches('^[a-z0-9-]+$') &&
              data.maskedKey is string && data.maskedKey.size() >= 4 && data.maskedKey.size() <= 64 &&
              data.publishableKeyEncrypted is string && data.publishableKeyEncrypted.size() >= 10 && data.publishableKeyEncrypted.size() <= 2048 &&
+             (!('publishableKeyServerEncrypted' in data) || (data.publishableKeyServerEncrypted is string && data.publishableKeyServerEncrypted.size() <= 2048)) &&
              data.keyVersion is int && data.keyVersion >= 1 && data.keyVersion <= 100 &&
              data.healthStatus is string && isValidHealthStatus(data.healthStatus) &&
              data.monitoringEnabled is bool &&
@@ -171,7 +172,7 @@ service cloud.firestore {
                          ]) &&
                          incoming().keys().hasOnly([
                            'userId', 'projectName', 'projectUrl', 'projectRef',
-                           'maskedKey', 'publishableKeyEncrypted', 'keyVersion',
+                           'maskedKey', 'publishableKeyEncrypted', 'publishableKeyServerEncrypted', 'keyVersion',
                            'healthStatus', 'monitoringEnabled', 'intervalHours',
                            'phaseOffsetMinutes', 'nextCheckEpochMs', 'lastCheckedEpochMs',
                            'lastSuccessEpochMs', 'lastLatencyMs', 'consecutiveFailures',
@@ -187,7 +188,7 @@ service cloud.firestore {
                            // Action: Toggle monitoring or edit project metadata/key
                            incoming().diff(existing()).affectedKeys().hasOnly([
                              'projectName', 'projectUrl', 'projectRef', 'maskedKey',
-                             'publishableKeyEncrypted', 'keyVersion', 'healthStatus',
+                             'publishableKeyEncrypted', 'publishableKeyServerEncrypted', 'keyVersion', 'healthStatus',
                              'monitoringEnabled', 'intervalHours', 'nextCheckEpochMs',
                              'lastSanitizedError', 'updatedAt'
                            ]) ||

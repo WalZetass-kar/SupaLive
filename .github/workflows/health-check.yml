@@ -1,0 +1,32 @@
+name: Scheduled Supabase Health Check
+
+on:
+  schedule:
+    # Runs every 3 hours (UTC) to keep Supabase projects active and respect 12h per-project schedules
+    - cron: '0 */3 * * *'
+  workflow_dispatch:
+
+jobs:
+  health-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: server/package-lock.json
+
+      - name: Install server runner dependencies
+        run: npm install --prefix server --no-audit --no-fund
+
+      - name: Run scheduled Supabase health checks
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          SUPALIVE_RSA_PRIVATE_KEY: ${{ secrets.SUPALIVE_RSA_PRIVATE_KEY }}
+        run: node server/health-check.mjs

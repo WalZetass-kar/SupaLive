@@ -102,7 +102,7 @@ class SupaliveViewModel(
 
   val notificationsState: StateFlow<UiState<List<AppNotification>>> =
     repository
-      .observeNotifications(currentUserId, limit = 25L)
+      .observeNotifications(currentUserId, limit = 15L)
       .map<List<AppNotification>, UiState<List<AppNotification>>> { UiState.Success(it) }
       .catch { error -> emit(unwrapFirestoreError(error, "Failed to load notifications")) }
       .stateIn(
@@ -441,8 +441,8 @@ class SupaliveViewModel(
   private companion object {
     const val TAG = "SupaliveVM"
     const val STOP_TIMEOUT_MS = 5000L
-    const val INITIAL_LOGS_LIMIT = 25L
-    const val LOGS_PAGE_SIZE = 25L
+    const val INITIAL_LOGS_LIMIT = 15L
+    const val LOGS_PAGE_SIZE = 20L
     const val MAX_LOGS_LIMIT = 200L
   }
 }

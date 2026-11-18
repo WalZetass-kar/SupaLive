@@ -1,4 +1,9 @@
-# Add project specific ProGuard rules here.
+# Preserve @Keep annotated Firestore models and security helpers
+-keepattributes Signature,InnerClasses,EnclosingMethod
+-keep @androidx.annotation.Keep class * { *; }
+-keepclassmembers class com.example.data.model.** { *; }
+-dontwarn com.google.errorprone.annotations.**
+-dontwarn javax.annotation.**
 # You can control the set of applied configuration files using the
 # proguardFiles setting in build.gradle.
 #

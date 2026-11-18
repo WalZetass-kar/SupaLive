@@ -1,0 +1,19 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "projects",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        {
+          "fieldPath": "monitoringEnabled",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nextCheckEpochMs",
+          "order": "ASCENDING"
+        }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

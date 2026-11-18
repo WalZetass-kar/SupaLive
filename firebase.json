@@ -2,7 +2,8 @@
   "firestore": [
     {
       "database": "ai-studio-android-supalive-275ae400-2b3e-4882-9b60-e2892d0b529a",
-      "rules": "firestore.rules"
+      "rules": "firestore.rules",
+      "indexes": "firestore.indexes.json"
     }
   ],
   "emulators": {

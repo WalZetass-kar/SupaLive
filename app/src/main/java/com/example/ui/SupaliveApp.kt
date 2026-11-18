@@ -1,15 +1,7 @@
 package com.example.ui
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.core.snap
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.togetherWith
+import android.content.Context
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.List
 import androidx.compose.material.icons.automirrored.rounded.List
@@ -78,7 +71,6 @@ import com.example.ui.screens.OverviewScreen
 import com.example.ui.screens.ProjectDetailScreen
 import com.example.ui.screens.ProjectsScreen
 import com.example.ui.screens.SettingsDialog
-import com.example.ui.theme.LocalReducedMotion
 import com.example.ui.theme.ThemeMode
 import com.example.ui.viewmodel.SupaliveViewModel
 import com.example.ui.viewmodel.UiState
@@ -180,11 +172,16 @@ private fun AuthenticatedSupaliveShell(
 
   LaunchedEffect(currentUserId) {
     withContext(Dispatchers.IO) {
-      WorkScheduler.ensure12HourSchedule(context)
+      // Scheduled 12-hour monitoring now runs server-side via GitHub Actions.
+      // Cancel any legacy local WorkManager schedule once to avoid duplicate pings and startup overhead.
+      val prefs = context.getSharedPreferences("supalive_prefs", Context.MODE_PRIVATE)
+      if (!prefs.getBoolean("legacy_worker_cancelled", false)) {
+        WorkScheduler.cancelSchedule(context)
+        prefs.edit().putBoolean("legacy_worker_cancelled", true).apply()
+      }
     }
   }
 
-  val reducedMotion = LocalReducedMotion.current
   val overviewListState = rememberLazyListState()
   val projectsListState = rememberLazyListState()
   val logsListState = rememberLazyListState()
@@ -197,49 +194,33 @@ private fun AuthenticatedSupaliveShell(
   var showSqlDialog by remember { mutableStateOf(false) }
   var showSettingsDialog by remember { mutableStateOf(false) }
 
-  AnimatedContent(
-    targetState = selectedProjectId,
-    transitionSpec = {
-      if (reducedMotion) {
-        fadeIn(snap()) togetherWith fadeOut(snap())
-      } else if (targetState != null) {
-        (slideInHorizontally(tween(180)) { it / 6 } + fadeIn(tween(160))) togetherWith
-          fadeOut(tween(140))
-      } else {
-        fadeIn(tween(160)) togetherWith
-          (slideOutHorizontally(tween(160)) { it / 6 } + fadeOut(tween(140)))
-      }
-    },
-    contentKey = { it != null },
-    label = "project_detail_transition",
-  ) { activeProjectId ->
-    if (activeProjectId != null) {
-      ProjectDetailRoute(
-        viewModel = viewModel,
-        projectId = activeProjectId,
-        onBack = { selectedProjectId = null },
-        onEdit = { editingProject = it },
-        onShowSql = { showSqlDialog = true },
-      )
-    } else {
-      MainTabScaffold(
-        viewModel = viewModel,
-        currentTab = currentTab,
-        isDarkTheme = isDarkTheme,
-        onTabSelected = { currentTab = it },
-        onToggleTheme = {
-          onThemeModeChange(if (isDarkTheme) ThemeMode.LIGHT else ThemeMode.DARK)
-        },
-        onOpenSettings = { showSettingsDialog = true },
-        onOpenAddProject = { showAddProjectDialog = true },
-        onOpenSqlGuide = { showSqlDialog = true },
-        onOpenProject = { selectedProjectId = it.id },
-        overviewListState = overviewListState,
-        projectsListState = projectsListState,
-        logsListState = logsListState,
-        alertsListState = alertsListState,
-      )
-    }
+  val activeProjectId = selectedProjectId
+  if (activeProjectId != null) {
+    ProjectDetailRoute(
+      viewModel = viewModel,
+      projectId = activeProjectId,
+      onBack = { selectedProjectId = null },
+      onEdit = { editingProject = it },
+      onShowSql = { showSqlDialog = true },
+    )
+  } else {
+    MainTabScaffold(
+      viewModel = viewModel,
+      currentTab = currentTab,
+      isDarkTheme = isDarkTheme,
+      onTabSelected = { currentTab = it },
+      onToggleTheme = {
+        onThemeModeChange(if (isDarkTheme) ThemeMode.LIGHT else ThemeMode.DARK)
+      },
+      onOpenSettings = { showSettingsDialog = true },
+      onOpenAddProject = { showAddProjectDialog = true },
+      onOpenSqlGuide = { showSqlDialog = true },
+      onOpenProject = { selectedProjectId = it.id },
+      overviewListState = overviewListState,
+      projectsListState = projectsListState,
+      logsListState = logsListState,
+      alertsListState = alertsListState,
+    )
   }
 
   if (showAddProjectDialog) {
@@ -289,10 +270,9 @@ private fun MainTabScaffold(
   logsListState: LazyListState,
   alertsListState: LazyListState,
 ) {
-  BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-    val useNavRail = maxWidth >= 600.dp
+  val useNavRail = LocalConfiguration.current.screenWidthDp >= 600
 
-    Scaffold(
+  Scaffold(
       snackbarHost = { FeedbackSnackbarHost(viewModel = viewModel) },
       topBar = {
         TopAppBar(
@@ -420,7 +400,6 @@ private fun MainTabScaffold(
         }
       }
     }
-  }
 }
 
 @Composable

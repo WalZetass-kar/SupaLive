@@ -14,6 +14,7 @@ import com.example.network.SupabaseHealthClient
 import com.example.security.KeyValidationResult
 import com.example.security.LogSanitizer
 import com.example.security.PublishableKeyValidator
+import com.example.security.ServerKeyEncryptor
 import com.example.security.SupabaseUrlValidator
 import com.example.security.SupaliveKeyManager
 import com.example.security.UrlValidationResult
@@ -275,6 +276,7 @@ class SupaliveRepository(
       val uid = requireMatchingUserId(userId)
       val projectId = "proj_${UUID.randomUUID().toString().replace("-", "").take(16)}"
       val (encryptedKey, keyVersion) = keyManager.encrypt(validKey.key)
+      val serverEncryptedKey = ServerKeyEncryptor.encrypt(validKey.key)
       val now = System.currentTimeMillis()
       val phaseOffset = SchedulerCalculator.generateInitialPhaseOffsetMinutes(validUrl.projectRef)
       val nextCheck = SchedulerCalculator.computeInitialNextCheckEpochMs(now, phaseOffset)
@@ -288,6 +290,7 @@ class SupaliveRepository(
           "projectRef" to validUrl.projectRef,
           "maskedKey" to validKey.maskedPreview,
           "publishableKeyEncrypted" to encryptedKey,
+          "publishableKeyServerEncrypted" to serverEncryptedKey,
           "keyVersion" to keyVersion.toLong(),
           "healthStatus" to HealthStatus.PENDING.firestoreValue,
           "monitoringEnabled" to true,
@@ -321,6 +324,7 @@ class SupaliveRepository(
           projectRef = validUrl.projectRef,
           maskedKey = validKey.maskedPreview,
           publishableKeyEncrypted = encryptedKey,
+          publishableKeyServerEncrypted = serverEncryptedKey,
           keyVersion = keyVersion.toLong(),
           healthStatus = HealthStatus.PENDING.firestoreValue,
           monitoringEnabled = true,
@@ -363,6 +367,7 @@ class SupaliveRepository(
     val validUrl = (urlResult as UrlValidationResult.Valid).url
 
     var encrypted = project.publishableKeyEncrypted
+    var serverEncrypted = project.publishableKeyServerEncrypted
     var masked = project.maskedKey
     var keyVer = project.keyVersion
 
@@ -375,6 +380,7 @@ class SupaliveRepository(
       val pair = keyManager.encrypt(validKey.key)
       encrypted = pair.first
       keyVer = pair.second.toLong()
+      serverEncrypted = ServerKeyEncryptor.encrypt(validKey.key)
       masked = validKey.maskedPreview
     }
 
@@ -388,6 +394,7 @@ class SupaliveRepository(
           "projectRef" to validUrl.projectRef,
           "maskedKey" to masked,
           "publishableKeyEncrypted" to encrypted,
+          "publishableKeyServerEncrypted" to serverEncrypted,
           "keyVersion" to keyVer,
           "lastSanitizedError" to "",
           "updatedAt" to FieldValue.serverTimestamp(),
